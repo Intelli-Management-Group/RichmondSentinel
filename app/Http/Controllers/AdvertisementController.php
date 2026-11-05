@@ -50,7 +50,7 @@ class AdvertisementController extends Controller
             }
             $advertisement_data = AdvertisementDetail::orderBy("publishDate", $sort_order);
             if ($search_value != "") {
-                $advertisement_data = $advertisement_data->whereRaw("(link like '%" . $search_value . "%' OR name like '%" . $search_value . "%')");
+                $advertisement_data = $advertisement_data->whereAny(["link", "name"], "like", "%" . $search_value . "%");
             }
             $total_ads = $advertisement_data->count();
             $advertisement_data = $advertisement_data->skip($start)->take($end)->get();
@@ -210,7 +210,6 @@ class AdvertisementController extends Controller
                 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(array("location" => $address)));
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                 $content  = curl_exec($ch);
-                curl_close($ch);
 
                 if ($content != "") {
                     $content_array = json_decode($content);
@@ -423,7 +422,6 @@ class AdvertisementController extends Controller
                 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(array("location" => $address)));
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                 $content  = curl_exec($ch);
-                curl_close($ch);
 
                 if ($content != "") {
                     $content_array = json_decode($content);

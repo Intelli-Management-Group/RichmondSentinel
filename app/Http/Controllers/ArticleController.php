@@ -62,7 +62,7 @@ class ArticleController extends Controller
                 $article_data = $article_data->orderBy($sort_column_name, $sort_order);
             }
             if ($search_value != "") {
-                $article_data = $article_data->whereRaw("(article_details.heading like '%" . $search_value . "%' OR category_details.name like '%" . $search_value . "%')");
+                $article_data = $article_data->whereAny(["article_details.heading", "category_details.name"], "like", "%" . $search_value . "%");
             }
             $total_articles = $article_data->count();
             $article_data = $article_data->skip($start)->take($end)->get();
@@ -153,7 +153,7 @@ class ArticleController extends Controller
                 $article_data = $article_data->orderBy($sort_column_name, $sort_order);
             }
             if ($search_value != "") {
-                $article_data = $article_data->whereRaw("(article_details.heading like '%" . $search_value . "%' OR category_details.name like '%" . $search_value . "%')");
+                $article_data = $article_data->whereAny(["article_details.heading", "category_details.name"], "like", "%" . $search_value . "%");
             }
             $total_articles = $article_data->count();
             $article_data = $article_data->skip($start)->take($end)->get();
@@ -765,7 +765,7 @@ class ArticleController extends Controller
             $all_tags = ArticleDetail::select("metaTag")->whereRaw("metaTag != ''");
             if ($search_string != "") {
                 $search_string = strtolower($search_string);
-                $all_tags = $all_tags->whereRaw("LOWER(metaTag) like '%" . addslashes($search_string) . "%'");
+                $all_tags = $all_tags->whereRaw("LOWER(metaTag) like ?", ["%" . $search_string . "%"]);
             }
             $all_tags = $all_tags->take(50)->orderBy("id", "desc")->get();
             foreach (count((array)$all_tags) > 0 ? $all_tags : array() as $t) {
